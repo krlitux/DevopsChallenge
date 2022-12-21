@@ -1,0 +1,37 @@
+version: '3'
+
+networks:
+  nginx18-php80-mysq80-node:
+
+services:
+  
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+    - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    networks:
+      - nginx18-php80-mysq80-node
+  
+  php:
+    image: php:8.0-alpine
+    volumes:
+      - ./app:/var/www/project
+    networks:
+      - nginx18-php80-mysq80-node
+  
+  nginx:
+    image: nginx:1.8
+    ports:
+      - 8008:8008
+    volumes:
+      - ./app:/var/www/project
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depens_on:
+      - php
+      - mysql
+    networks:
+      - nginx18-php80-mysq80-node
